@@ -3,253 +3,1011 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI News Script Generator - Gerbang Nusantara</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>RencanaKita - Dashboard Perencana Pernikahan Pintar</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#FBF7F0',
+                            sidebar: '#FAF4E8',
+                            cardAccent: '#F3E7D3',
+                            primary: '#B34154', // Rose Gold/Dusty Rose
+                            secondary: '#7A2E3D',
+                            creamAccent: '#EFE6D5',
+                            lightPink: '#F7D3D9',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Sembunyikan scrollbar bawaan tapi pertahankan fungsionalitas scroll */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF4E8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #EFE6D5;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B34154;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen pb-12">
+<body class="bg-brand-bg text-slate-700 min-h-screen flex font-sans">
 
-    <header class="bg-blue-600 text-white shadow-md py-6 mb-8">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold">News Formatter </h1>
-                <p class="text-sm text-blue-100">Tempel berita utuh, akan menyusun otomatis ke format script live.</p>
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-brand-sidebar p-6 flex flex-col justify-between border-r border-brand-creamAccent shrink-0 h-screen sticky top-0">
+        <div>
+            <!-- App Logo (Inspired by image_1c72f4.jpg) -->
+            <div class="flex items-center gap-2 mb-6">
+                <span class="text-brand-primary text-2xl"><i class="fa-solid fa-heart"></i></span>
+                <span class="font-bold text-xl font-serif text-slate-800 tracking-wide">RencanaKita</span>
             </div>
-            <span class="bg-blue-700 text-xs px-3 py-1.5 rounded-full font-mono">v1</span>
-        </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <div class="lg:col-span-5 space-y-6">
-            
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-200 space-y-4">
-                <h2 class="text-md font-bold text-gray-700 uppercase tracking-wider border-b pb-2">1. Pengaturan Sesi & API</h2>
+            <!-- Profile Info Card -->
+            <div class="bg-brand-cardAccent p-4 rounded-xl mb-6 border border-[#E5D7BF]">
+                <span class="text-[10px] bg-white text-brand-secondary px-2.5 py-1 rounded-full font-bold tracking-wider uppercase">H-167</span>
+                <h4 class="font-bold text-sm text-slate-800 mt-2.5 leading-snug">Anindya Putri Lestari & Reza Adhi Pratama</h4>
+                <p class="text-xs text-slate-500 mt-1"><i class="fa-regular fa-calendar-days mr-1"></i> 18 Oktober 2026</p>
+                <div class="flex justify-between items-center mt-4 pt-3 border-t border-[#E5D7BF]">
+                    <div class="flex -space-x-2">
+                        <div class="w-7 h-7 rounded-full bg-brand-primary text-[10px] flex items-center justify-center font-bold text-white shadow-xs border border-white">A</div>
+                        <div class="w-7 h-7 rounded-full bg-emerald-600 text-[10px] flex items-center justify-center font-bold text-white shadow-xs border border-white">R</div>
+                    </div>
+                    <span class="text-[10px] text-slate-600 font-medium bg-white/60 px-2 py-0.5 rounded-full">1 Akun Aktif</span>
+                </div>
+            </div>
+
+            <!-- Interactive Module Menu -->
+            <nav class="space-y-1">
+                <p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">Modul Perencanaan</p>
                 
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Gemini API Key</label>
-                    <input type="password" id="apiKey" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" placeholder="Masukkan Gemini API Key Anda...">
-                    <p class="text-[10px] text-gray-400 mt-1">Dapatkan kunci gratis di Google AI Studio untuk memproses teks secara otomatis.</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Nama Pembawa</label>
-                        <input type="text" id="presenterName" value="Andi" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Jam Live (Siang)</label>
-                        <input type="text" id="liveTime" value="14.00" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500">
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-200 space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h2 class="text-md font-bold text-gray-700 uppercase tracking-wider">2. Input Berita Utuh</h2>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono" id="newsCountLabel">0 Berita</span>
-                </div>
-
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Topik Singkat Berita ini</label>
-                        <input type="text" id="currentTopic" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" placeholder="Contoh: Dugaan Korupsi Disdikbud Kukar">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Tempel Berita Full / Artikel Mentah</label>
-                        <textarea id="rawNewsInput" class="w-full border border-gray-300 rounded-lg p-3 h-48 text-sm focus:outline-blue-500" placeholder="Salin dan tempel seluruh isi artikel berita dari website berita di sini..."></textarea>
-                    </div>
-                </div>
-
-                <button onclick="processNewsWithAI()" id="btnProcess" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg shadow-xs transition cursor-pointer text-center text-sm">
-                    Ekstrak & Format dengan AI
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-lg transition-all text-brand-secondary bg-white shadow-xs">
+                    <i class="fa-solid fa-chart-pie w-5 text-brand-primary"></i> Dashboard
                 </button>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-200">
-                <h2 class="text-md font-bold text-gray-700 uppercase tracking-wider border-b pb-2 mb-3">3. Daftar Berita di Antrean</h2>
-                <div id="newsListContainer" class="text-sm space-y-2 max-h-40 overflow-y-auto">
-                    <p class="text-gray-400 text-xs italic">Belum ada berita yang diproses...</p>
-                </div>
-                <button onclick="generateFinalScript()" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition transform active:scale-98 cursor-pointer text-center text-sm">
-                    Generate Naskah Live Akhir
+                
+                <button onclick="switchTab('anggaran')" id="btn-anggaran" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-600 hover:bg-brand-creamAccent hover:text-slate-800">
+                    <i class="fa-solid fa-wallet w-5"></i> Anggaran
                 </button>
-            </div>
+                
+                <button onclick="switchTab('tugas')" id="btn-tugas" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-600 hover:bg-brand-creamAccent hover:text-slate-800">
+                    <i class="fa-solid fa-list-check w-5"></i> Daftar Tugas
+                </button>
+                
+                <button onclick="switchTab('tamu')" id="btn-tamu" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-600 hover:bg-brand-creamAccent hover:text-slate-800">
+                    <i class="fa-solid fa-users w-5"></i> Daftar Tamu & RSVP
+                </button>
+
+                <button onclick="switchTab('rundown')" id="btn-rundown" class="menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-600 hover:bg-brand-creamAccent hover:text-slate-800">
+                    <i class="fa-solid fa-clock w-5"></i> Rundown Hari-H
+                </button>
+
+                <a href="indoinvite_app.html" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-lg transition-all text-amber-800 bg-amber-50 hover:bg-amber-100 mt-3 border border-amber-200">
+                    <i class="fa-solid fa-envelope-open-text w-5 text-amber-600"></i> Studio Undangan (IndoInvite)
+                </a>
+            </nav>
         </div>
 
-        <div class="lg:col-span-7 space-y-4">
-            <div class="bg-white p-5 rounded-xl shadow-xs border border-gray-200 h-full flex flex-col">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h2 class="text-md font-bold text-gray-700 uppercase tracking-wider">Hasil Akhir Naskah Live</h2>
-                    <button onclick="copyToClipboard()" class="bg-gray-800 hover:bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">
-                        Salin Naskah
+        <!-- System & Setup Settings -->
+        <div class="space-y-1 pt-4 border-t border-brand-creamAccent">
+            <div class="flex items-center justify-between px-3 py-2 text-xs text-slate-500">
+                <span>Bahasa: <strong>Indonesia 🇮🇩</strong></span>
+            </div>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-xs text-slate-500 hover:text-slate-800 transition">
+                <i class="fa-solid fa-gear"></i> Pengaturan Akun
+            </a>
+            <button onclick="alert('Terima kasih telah menggunakan RencanaKita!')" class="w-full flex items-center gap-3 px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 rounded-lg transition mt-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto w-full">
+
+        <!-- ==================== MODULE: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="tab-content block space-y-8">
+            <!-- Hero Header Banner with real image_1c72f4.jpg reference inside background design -->
+            <div class="relative bg-gradient-to-r from-[#F6E6D4] to-[#F1DEC9] rounded-3xl p-8 flex items-center justify-between overflow-hidden shadow-xs">
+                <!-- Decorative flower circle overlay -->
+                <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-brand-lightPink/40 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 max-w-md">
+                    <span class="text-xs tracking-wider uppercase font-bold text-brand-secondary bg-white/80 px-3 py-1 rounded-full">Wedding Companion</span>
+                    <h2 class="font-serif text-3xl font-bold text-slate-800 mt-3">Persiapkan Momen Bahagiamu dengan RencanaKita</h2>
+                    <p class="text-sm text-slate-600 mt-2">Atur anggaran, checklist tugas harian, hingga tamu undangan dalam satu genggaman interaktif.</p>
+                    <div class="flex gap-3 mt-5">
+                        <button onclick="switchTab('anggaran')" class="bg-brand-primary hover:bg-brand-secondary text-white font-medium text-xs px-5 py-2.5 rounded-full transition shadow-md">
+                            <i class="fa-solid fa-wallet mr-1.5"></i> Cek Anggaran
+                        </button>
+                        <button onclick="switchTab('tugas')" class="bg-white/80 hover:bg-white text-slate-800 font-medium text-xs px-5 py-2.5 rounded-full transition shadow-xs">
+                            Atur Tugas Hari Ini
+                        </button>
+                    </div>
+                </div>
+                <!-- Aesthetic Couple Portrait -->
+                <div class="hidden md:block relative z-10 w-48 h-48 rounded-full border-4 border-white overflow-hidden shadow-lg shrink-0">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/14393063993000600052_0" alt="Pasangan RencanaKita" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- Real-Time Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-brand-primary text-xl"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Hari Tersisa</span>
+                        <span id="countdown-days" class="text-2xl font-bold text-slate-800">167 Hari</span>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-xl"><i class="fa-solid fa-tasks"></i></div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Progress Tugas</span>
+                        <span id="task-progress-stat" class="text-2xl font-bold text-slate-800">0% Selesai</span>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl"><i class="fa-solid fa-piggy-bank"></i></div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Total Dana Terpakai</span>
+                        <span id="summary-spent" class="text-2xl font-bold text-slate-800">Rp 47.5 jt</span>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-2xs flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl"><i class="fa-solid fa-users-viewfinder"></i></div>
+                    <div>
+                        <span class="text-xs text-slate-400 block font-medium">Tamu Terdaftar</span>
+                        <span id="summary-guests" class="text-2xl font-bold text-slate-800">0 Orang</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini Layouts: Tasks & Upcoming Events Side-by-Side -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Task List Card -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs lg:col-span-2">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="font-serif text-lg font-bold text-slate-800"><i class="fa-solid fa-circle-exclamation text-brand-primary mr-1.5"></i> Tugas Mendesak</h3>
+                        <button onclick="switchTab('tugas')" class="text-xs text-brand-primary hover:underline font-semibold">Lihat Semua</button>
+                    </div>
+                    <div id="dashboard-urgent-tasks" class="space-y-3.5">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Aesthetic Photo & Quote Widget -->
+                <div class="bg-brand-sidebar p-6 rounded-2xl border border-brand-creamAccent flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-15">
+                        <img src="http://googleusercontent.com/image_collection/image_retrieval/3344464484280504115_0" alt="Pastel theme background" class="w-full h-full object-cover">
+                    </div>
+                    <div class="relative z-10">
+                        <i class="fa-solid fa-quote-left text-brand-lightPink text-4xl mb-4 block"></i>
+                        <p class="font-serif italic text-md text-slate-700 leading-relaxed">"Satu pernikahan yang indah bukan hasil dari anggaran yang tanpa batas, melainkan persiapan penuh cinta dan komunikasi yang selaras."</p>
+                    </div>
+                    <div class="relative z-10 pt-6 border-t border-[#E5D7BF] mt-6">
+                        <span class="text-xs font-bold text-brand-secondary">RencanaKita Wedding Advisor</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE: ANGGARAN ==================== -->
+        <section id="tab-anggaran" class="tab-content hidden space-y-6">
+            <!-- Header Section (Inspired by image_1c72f4.jpg) -->
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="font-serif text-2xl md:text-3xl font-semibold text-slate-800">Anggaran Pernikahan</h1>
+                    <p class="text-xs text-slate-500 mt-1">Kelola target anggaran dan pantau realisasi pembayaran vendor.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openEditBudgetModal()" class="px-4 py-2 border border-slate-300 bg-white hover:bg-slate-50 text-xs rounded-full font-medium shadow-xs transition duration-150 flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Target
+                    </button>
+                    <button onclick="openAddCategoryModal()" class="px-4 py-2 bg-[#F7D3D9] hover:bg-[#F5C2CC] text-[#7A2E3D] text-xs rounded-full font-semibold shadow-xs transition duration-150 flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i> Tambah Kategori
                     </button>
                 </div>
-                
-                <textarea id="outputText" readonly class="w-full flex-1 min-h-[75vh] bg-gray-900 text-green-400 font-mono p-5 text-xs rounded-xl border border-gray-800 focus:outline-none resize-y" placeholder="Naskah komplit siap pakai akan muncul di sini..."></textarea>
             </div>
-        </div>
+
+            <!-- Banner Progress Utama (Replica of image_1c72f4.jpg) -->
+            <div class="bg-gradient-to-r from-[#F6E6D4] to-[#F1DEC9] p-6 rounded-2xl shadow-2xs relative overflow-hidden">
+                <span class="text-[10px] tracking-wider font-bold text-[#A47E6C] uppercase">Total Terpakai</span>
+                <div class="flex items-baseline gap-2 mt-1.5 mb-4">
+                    <span id="budget-spent-large" class="font-serif text-4xl font-bold text-[#3A302F]">Rp 47.5 jt</span>
+                    <span class="text-lg text-[#6B5A53]">/ <span id="budget-target-span">150</span> jt</span>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-[#E5D2BE] h-3.5 rounded-full overflow-hidden">
+                    <div id="budget-progress-bar" class="bg-[#B34154] h-full rounded-full transition-all duration-500" style="width: 32%;"></div>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                    <p id="budget-percentage" class="text-xs text-[#8A7165] font-semibold">32% dari anggaran</p>
+                    <p class="text-xs text-slate-500 italic">Diperbarui waktu nyata</p>
+                </div>
+            </div>
+
+            <!-- 4 Summary Cards (Replica of image_1c72f4.jpg) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs">
+                    <span class="text-[11px] text-slate-400 block mb-1 font-medium"><i class="fa-solid fa-chart-line mr-1"></i> Total Anggaran</span>
+                    <span id="card-total-budget" class="text-lg font-bold text-slate-800">150jt</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs">
+                    <span class="text-[11px] text-slate-400 block mb-1 font-medium"><i class="fa-solid fa-handshake-angle mr-1"></i> Total Direncanakan</span>
+                    <span id="card-planned-budget" class="text-lg font-bold text-slate-800">150jt</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs">
+                    <span class="text-[11px] text-slate-400 block mb-1 font-medium"><i class="fa-solid fa-square-poll-vertical mr-1"></i> Total Terbayar</span>
+                    <span id="card-spent-budget" class="text-lg font-bold text-slate-800">47.5jt</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs">
+                    <span class="text-[11px] text-slate-400 block mb-1 font-medium"><i class="fa-solid fa-sack-dollar mr-1"></i> Sisa Anggaran</span>
+                    <span id="card-rem-budget" class="text-lg font-bold text-slate-800">102.5jt</span>
+                </div>
+            </div>
+
+            <!-- Budget Category Section -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-md font-bold text-slate-800">Item Pengeluaran</h3>
+                    <span class="text-xs text-slate-500">Klik hapus pada tombol di sebelah kanan apabila terjadi kesalahan</span>
+                </div>
+                
+                <!-- Dynamic Category List (Rendered dynamically via JS) -->
+                <div id="budget-category-list" class="space-y-6">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE: DAFTAR TUGAS (CHECKLIST) ==================== -->
+        <section id="tab-tugas" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="font-serif text-2xl md:text-3xl font-semibold text-slate-800">Daftar Persiapan & Tugas</h1>
+                    <p class="text-xs text-slate-500 mt-1">Kelola seluruh persiapan pernikahan agar tidak ada detail yang terlewat.</p>
+                </div>
+                <button onclick="openAddTaskModal()" class="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white text-xs rounded-full font-semibold shadow-xs transition duration-150 flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Tambah Tugas Baru
+                </button>
+            </div>
+
+            <!-- Filters & Progress -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+                    <span class="text-xs text-slate-400 font-medium">Persentase Selesai</span>
+                    <h2 id="task-pct-value" class="text-3xl font-bold text-brand-primary my-2">0%</h2>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div id="task-progress-bar" class="bg-brand-primary h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-2xs md:col-span-2">
+                    <span class="text-xs text-slate-400 font-medium">Filter Status</span>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="filterTasks('all')" id="filter-task-all" class="task-filter-btn px-4 py-2 text-xs font-semibold rounded-full bg-brand-primary text-white transition">Semua Tugas</button>
+                        <button onclick="filterTasks('pending')" id="filter-task-pending" class="task-filter-btn px-4 py-2 text-xs font-medium rounded-full bg-slate-50 text-slate-600 hover:bg-slate-100 transition">Belum Selesai</button>
+                        <button onclick="filterTasks('completed')" id="filter-task-completed" class="task-filter-btn px-4 py-2 text-xs font-medium rounded-full bg-slate-50 text-slate-600 hover:bg-slate-100 transition">Selesai</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks List Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs">
+                <div id="task-list-container" class="divide-y divide-slate-100">
+                    <!-- Generated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE: DAFTAR TAMU & RSVP ==================== -->
+        <section id="tab-tamu" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="font-serif text-2xl md:text-3xl font-semibold text-slate-800">Daftar Tamu & Konfirmasi RSVP</h1>
+                    <p class="text-xs text-slate-500 mt-1">Pantau calon tamu yang diundang serta konfirmasi kehadiran mereka.</p>
+                </div>
+                <button onclick="openAddGuestModal()" class="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white text-xs rounded-full font-semibold shadow-xs transition duration-150 flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-plus"></i> Tambah Tamu
+                </button>
+            </div>
+
+            <!-- RSVP Summaries -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs">
+                    <span class="text-xs text-slate-400 block mb-1 font-medium">Total Tamu</span>
+                    <span id="guest-stat-total" class="text-2xl font-bold text-slate-800">0</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs border-l-4 border-emerald-500">
+                    <span class="text-xs text-emerald-600 block mb-1 font-medium">Konfirmasi Hadir</span>
+                    <span id="guest-stat-yes" class="text-2xl font-bold text-emerald-600">0</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs border-l-4 border-rose-500">
+                    <span class="text-xs text-rose-600 block mb-1 font-medium">Berhalangan</span>
+                    <span id="guest-stat-no" class="text-2xl font-bold text-rose-600">0</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-2xs border-l-4 border-amber-500">
+                    <span class="text-xs text-amber-600 block mb-1 font-medium">Belum Merespon</span>
+                    <span id="guest-stat-pending" class="text-2xl font-bold text-amber-600">0</span>
+                </div>
+            </div>
+
+            <!-- Guest List Table / Grid -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-bold text-slate-700 text-sm">Tabel Pengunjung</h3>
+                    <input type="text" id="guest-search" oninput="searchGuests()" placeholder="Cari nama tamu..." class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs w-48 focus:outline-none focus:ring-2 focus:ring-brand-primary">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-100">
+                                <th class="py-4 px-6">Nama Lengkap</th>
+                                <th class="py-4 px-6">Kelompok/Kolega</th>
+                                <th class="py-4 px-6">Status Kehadiran (RSVP)</th>
+                                <th class="py-4 px-6">Jumlah Pax</th>
+                                <th class="py-4 px-6 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guest-table-body" class="divide-y divide-slate-100 text-sm text-slate-700">
+                            <!-- Filled dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== MODULE: RUNDOWN HARI H ==================== -->
+        <section id="tab-rundown" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="font-serif text-2xl md:text-3xl font-semibold text-slate-800">Rundown Hari H</h1>
+                    <p class="text-xs text-slate-500 mt-1">Atur jadwal acara dan penanggung jawab agar akad nikah & resepsi berjalan mulus.</p>
+                </div>
+                <button onclick="openAddRundownModal()" class="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white text-xs rounded-full font-semibold shadow-xs transition duration-150 flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Tambah Kegiatan
+                </button>
+            </div>
+
+            <!-- Timeline Area -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-2xs">
+                <div class="relative pl-6 border-l-2 border-brand-lightPink ml-4 space-y-8" id="rundown-timeline-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-    
-    <script type="module">
-        import { GoogleGenAI } from '@google/generative-ai';
+    <!-- ==================== INTERACTIVE STATE MODALS ==================== -->
 
-        let processedNewsArray = [];
-
-        // Daftarkan fungsi ke objek window agar bisa dipanggil dari tombol HTML biasa
-        window.processNewsWithAI = async function() {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const topic = document.getElementById('currentTopic').value.trim();
-            const rawNews = document.getElementById('rawNewsInput').value.trim();
-            const btn = document.getElementById('btnProcess');
-
-            if (!apiKey) return alert('Silakan masukkan Gemini API Key terlebih dahulu.');
-            if (!topic) return alert('Silakan isi topik singkat berita terlebih dahulu.');
-            if (!rawNews) return alert('Silakan tempel teks berita utuh terlebih dahulu.');
-
-            btn.disabled = true;
-            btn.innerText = "Menganalisis & Memotong Teks Berita... ⏳";
-
-            const prompt = `Anda adalah asisten scriptwriter berita live. Tugas Anda adalah mengubah berita mentah berikut menjadi potongan naskah siap baca teleprompter pendek yang terstruktur secara ketat dalam format JSON. 
-
-Kriteria pemotongan teks: setiap baris frasa harus pendek (maksimal 3-5 kata), diapit tanda kutip dua ("..."), dan diakhiri tanda titik di dalam tanda kutip. Huruf pertama setiap frasa wajib kapital.
-
-Berita Mentah: 
-"${rawNews}"
-
-Kembalikan hasil dalam struktur JSON yang valid dengan properti sebagai berikut:
-{
-  "title": "Tulis judul berita yang menarik dan padat di sini",
-  "hoox": "\\"Frasa 1.\\"\\n\\n\\"Frasa 2.\\"\\n\\n\\"Frasa 3.\\"",
-  "story": "Ubah isi berita menjadi potongan frasa pendek sejenis",
-  "observation": "Isi analisis atau data observasi dari berita dalam frasa pendek",
-  "problem": "Masalah utama dari berita dalam potongan frasa pendek",
-  "insight": "Insight atau hikmah dari berita dalam potongan frasa pendek",
-  "solusi": "Langkah solusi yang diambil dalam potongan frasa pendek",
-  "benefit": "Keuntungan yang didapat dalam potongan frasa pendek",
-  "connection": "Pesan penutup moral/hukum dalam potongan frasa pendek",
-  "cta": "Pertanyaan interaksi penonton dalam potongan frasa pendek",
-  "reaksi": "Reaksi isu / konklusi interaksi komentar dalam potongan frasa pendek"
-}`;
-
-            try {
-                // Menggunakan SDK Resmi Google AI yang lolos dari pemblokiran CORS lokal browser
-                const ai = new GoogleGenAI({ apiKey: apiKey });
-                const response = await ai.models.generateContent({
-                    model: 'gemini-1.5-flash',
-                    contents: prompt,
-                    config: {
-                        responseMimeType: "application/json"
-                    }
-                });
-
-                const jsonText = response.text;
-                const result = JSON.parse(jsonText);
-                
-                processedNewsArray.push({
-                    topic: topic,
-                    title: result.title,
-                    formattedContent: result
-                });
-
-                updateNewsListUI();
-                
-                document.getElementById('currentTopic').value = '';
-                document.getElementById('rawNewsInput').value = '';
-                alert('Berita berhasil diproses oleh AI dan dimasukkan ke antrean!');
-
-            } catch (error) {
-                console.error(error);
-                alert('Gagal memproses. Pastikan API Key Anda aktif, berstatus valid, dan tidak ada pemblokiran ekstensi ad-blocker di browser.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Ekstrak & Format dengan AI ";
-            }
-        }
-
-        window.updateNewsListUI = function() {
-            const container = document.getElementById('newsListContainer');
-            const label = document.getElementById('newsCountLabel');
-            
-            label.innerText = `${processedNewsArray.length} Berita`;
-            
-            if (processedNewsArray.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-xs italic">Belum ada berita yang diproses...</p>';
-                return;
-            }
-
-            container.innerHTML = processedNewsArray.map((item, index) => `
-                <div class="flex justify-between items-center bg-gray-100 p-2 rounded">
-                    <div class="truncate pr-2">
-                        <span class="font-bold text-xs text-blue-600">#${index+1} [${item.topic}]</span>
-                        <p class="text-xs text-gray-600 truncate">${item.title}</p>
-                    </div>
-                    <button onclick="deleteNews(${index})" class="text-red-500 hover:text-red-700 text-xs font-bold cursor-pointer">Hapus</button>
+    <!-- Modal: Edit Target Anggaran -->
+    <div id="modal-edit-budget" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-lg font-bold text-slate-800">Edit Target Anggaran</h3>
+                <button onclick="closeModal('modal-edit-budget')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Target Anggaran (Juta Rp)</label>
+                    <input type="number" id="input-target-budget" placeholder="Contoh: 150" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
                 </div>
-            `).join('');
+                <button onclick="saveTargetBudget()" class="w-full py-2 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-lg text-sm transition">Simpan Anggaran</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Tambah Kategori Anggaran -->
+    <div id="modal-add-category" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-lg font-bold text-slate-800">Tambah Kategori Anggaran</h3>
+                <button onclick="closeModal('modal-add-category')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Kategori</label>
+                    <input type="text" id="input-cat-name" placeholder="Misal: Souvenir, Sound System" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Direncanakan (Rp)</label>
+                        <input type="number" id="input-cat-planned" placeholder="Misal: 15000000" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Terbayar (Rp)</label>
+                        <input type="number" id="input-cat-spent" placeholder="Misal: 5000000" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Catatan Tambahan</label>
+                    <input type="text" id="input-cat-note" placeholder="Misal: Vendor Souvenir Bandung" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <button onclick="saveCategoryBudget()" class="w-full py-2.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-lg text-sm transition">Tambahkan Kategori</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Tambah Tugas Baru -->
+    <div id="modal-add-task" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-lg font-bold text-slate-800">Tambah Tugas Persiapan</h3>
+                <button onclick="closeModal('modal-add-task')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Tugas / Aktivitas</label>
+                    <input type="text" id="input-task-name" placeholder="Misal: Booking katering DP 50%" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kategori Persiapan</label>
+                    <select id="input-task-cat" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                        <option value="Administrasi KUA">Administrasi KUA</option>
+                        <option value="Venue & Gedung">Venue & Gedung</option>
+                        <option value="Busana & Dekorasi">Busana & Dekorasi</option>
+                        <option value="Katering">Katering</option>
+                        <option value="Selesai Acara">Selesai Acara</option>
+                    </select>
+                </div>
+                <button onclick="saveNewTask()" class="w-full py-2.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-lg text-sm transition">Tambahkan Tugas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Tambah Tamu Baru -->
+    <div id="modal-add-guest" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-lg font-bold text-slate-800">Tambah Daftar Tamu</h3>
+                <button onclick="closeModal('modal-add-guest')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Tamu Undangan</label>
+                    <input type="text" id="input-guest-name" placeholder="Contoh: Bpk. Joko Widodo" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelompok Hubungan</label>
+                    <input type="text" id="input-guest-group" placeholder="Misal: Teman SMA, Keluarga Besar" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Status RSVP</label>
+                        <select id="input-guest-rsvp" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                            <option value="pending">Belum Merespon</option>
+                            <option value="yes">Hadir</option>
+                            <option value="no">Tidak Hadir</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jumlah Pax</label>
+                        <input type="number" id="input-guest-pax" value="2" min="1" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                    </div>
+                </div>
+                <button onclick="saveNewGuest()" class="w-full py-2.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-lg text-sm transition">Tambahkan Tamu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Tambah Rundown Kegiatan -->
+    <div id="modal-add-rundown" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif text-lg font-bold text-slate-800">Tambah Kegiatan Rundown</h3>
+                <button onclick="closeModal('modal-add-rundown')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jam Mulai</label>
+                        <input type="time" id="input-run-time" value="08:00" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Durasi</label>
+                        <input type="text" id="input-run-duration" placeholder="Misal: 60 Menit" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nama Aktivitas</label>
+                    <input type="text" id="input-run-activity" placeholder="Misal: Akad Nikah & Tukar Cincin" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Penanggung Jawab (PIC)</label>
+                    <input type="text" id="input-run-pic" placeholder="Misal: Pak RT / WO Lapangan" class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary focus:outline-none">
+                </div>
+                <button onclick="saveNewRundown()" class="w-full py-2.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-lg text-sm transition">Tambahkan Rundown</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT LOGICS & CONTROLLERS ==================== -->
+    <script>
+        // Default Mock Data for Wedding Application State
+        let budgetTarget = 150; // Juta rupiah
+
+        let budgetCategories = [
+            { id: 1, name: "Venue & Gedung", planned: 45000000, spent: 15000000, color: "bg-rose-400", alert: "1 JATUH TEMPO" },
+            { id: 2, name: "Catering & Konsumsi", planned: 37500000, spent: 12500000, color: "bg-emerald-400", alert: "1 JATUH TEMPO" },
+            { id: 3, name: "Dokumentasi (Foto & Video)", planned: 15000000, spent: 15000000, color: "bg-amber-600", alert: "" },
+            { id: 4, name: "Dekorasi & Pelaminan", planned: 15000000, spent: 5000000, color: "bg-yellow-700", alert: "" },
+            { id: 5, name: "Busana & Rias", planned: 7500000, spent: 0, color: "bg-purple-500", alert: "" }
+        ];
+
+        let taskList = [
+            { id: 1, text: "Urus surat numpang nikah di KUA", category: "Administrasi KUA", completed: true },
+            { id: 2, text: "DP 30% Gedung Pertemuan", category: "Venue & Gedung", completed: true },
+            { id: 3, text: "Uji rasa hidangan (Food Tasting) catering", category: "Katering", completed: false },
+            { id: 4, text: "Fitting busana akad & resepsi pengantin", category: "Busana & Dekorasi", completed: false },
+            { id: 5, text: "Sewa vendor live music & sound system", category: "Venue & Gedung", completed: false }
+        ];
+
+        let guestList = [
+            { id: 1, name: "Bpk. Hermawan & Ibu", group: "Keluarga Besar", rsvp: "yes", pax: 2 },
+            { id: 2, name: "Andini Sulastri", group: "Teman SMA", rsvp: "no", pax: 1 },
+            { id: 3, name: "Rian Prasetyo", group: "Rekan Kantor", rsvp: "pending", pax: 2 }
+        ];
+
+        let rundownList = [
+            { id: 1, time: "07:30", duration: "30 Mins", activity: "Persiapan Keluarga & Rias Pengantin", pic: "MUA Team" },
+            { id: 2, time: "08:00", duration: "60 Mins", activity: "Akad Nikah & Pembacaan Doa", pic: "WO Lapangan & Pak Penghulu" },
+            { id: 3, time: "09:30", duration: "45 Mins", activity: "Upacara Adat Tradisional", pic: "Sesepuh Adat" },
+            { id: 4, time: "11:00", duration: "120 Mins", activity: "Resepsi Pernikahan & Ramah Tamah", pic: "MC & Wedding Organizer" }
+        ];
+
+        let currentTaskFilter = 'all';
+
+        // Initialize state on render
+        window.onload = function() {
+            renderAll();
+        };
+
+        function renderAll() {
+            renderBudgets();
+            renderTasks();
+            renderGuests();
+            renderRundown();
+            updateSummaryCards();
         }
 
-        window.deleteNews = function(index) {
-            processedNewsArray.splice(index, 1);
-            updateNewsListUI();
+        // Module Navigation
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(element => {
+                element.classList.add('hidden');
+                element.classList.remove('block');
+            });
+            // Show active tab
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('block');
+
+            // Style active nav menu button
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.className = "menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-600 hover:bg-brand-creamAccent hover:text-slate-800";
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.className = "menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-lg transition-all text-brand-secondary bg-white shadow-xs";
         }
 
-        window.generateFinalScript = function() {
-            if (processedNewsArray.length === 0) return alert('Belum ada berita terproses di antrean.');
-            
-            const presenter = document.getElementById('presenterName').value || '[Nama]';
-            const time = document.getElementById('liveTime').value || '[---]';
+        // Modals Management
+        function openEditBudgetModal() {
+            document.getElementById('input-target-budget').value = budgetTarget;
+            document.getElementById('modal-edit-budget').classList.remove('hidden');
+        }
+        function openAddCategoryModal() {
+            document.getElementById('modal-add-category').classList.remove('hidden');
+        }
+        function openAddTaskModal() {
+            document.getElementById('modal-add-task').classList.remove('hidden');
+        }
+        function openAddGuestModal() {
+            document.getElementById('modal-add-guest').classList.remove('hidden');
+        }
+        function openAddRundownModal() {
+            document.getElementById('modal-add-rundown').classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
 
-            let finalScript = `“hai hai Selamat siang semuanya, Perkenalkan saya ${presenter} disini akan membawakan sesi live Gerbang Nusantara seperti biasa  di hari sabtu jam ${time} siang saat  ini, di sesi live ini kita akan membahas kejadian yang terjadi dalam minggu terakhir.”\n\n`;
-            finalScript += `“Di sesi live ini kita akan membahas berbagai kejadian penting yang terjadi dalam satu minggu terakhir dari isu nasional sampai daerah, yang tentunya relevan dengan kita semua.”\n\n`;
-            finalScript += `“Dan hari ini kita akan bahas beberapa topik hangat, di antaranya:\n\n`;
-            
-            processedNewsArray.forEach(item => {
-                finalScript += `${item.topic}\n`;
+        // Core Functions: BUDGETING
+        function saveTargetBudget() {
+            const inputVal = parseFloat(document.getElementById('input-target-budget').value);
+            if (inputVal && inputVal > 0) {
+                budgetTarget = inputVal;
+                closeModal('modal-edit-budget');
+                renderAll();
+            }
+        }
+
+        function saveCategoryBudget() {
+            const name = document.getElementById('input-cat-name').value;
+            const planned = parseFloat(document.getElementById('input-cat-planned').value) || 0;
+            const spent = parseFloat(document.getElementById('input-cat-spent').value) || 0;
+            const note = document.getElementById('input-cat-note').value;
+
+            if (name) {
+                const colors = ["bg-rose-400", "bg-emerald-400", "bg-amber-600", "bg-yellow-700", "bg-purple-500", "bg-indigo-400"];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                budgetCategories.push({
+                    id: Date.now(),
+                    name: name,
+                    planned: planned,
+                    spent: spent,
+                    color: randomColor,
+                    alert: note ? note.toUpperCase() : ""
+                });
+                
+                // Reset form fields
+                document.getElementById('input-cat-name').value = '';
+                document.getElementById('input-cat-planned').value = '';
+                document.getElementById('input-cat-spent').value = '';
+                document.getElementById('input-cat-note').value = '';
+                
+                closeModal('modal-add-category');
+                renderAll();
+            }
+        }
+
+        function deleteCategory(id) {
+            if(confirm("Apakah Anda yakin ingin menghapus pengeluaran ini?")) {
+                budgetCategories = budgetCategories.filter(item => item.id !== id);
+                renderAll();
+            }
+        }
+
+        function renderBudgets() {
+            const container = document.getElementById('budget-category-list');
+            container.innerHTML = '';
+
+            let totalSpent = 0;
+            let totalPlanned = 0;
+
+            budgetCategories.forEach(cat => {
+                totalSpent += cat.spent;
+                totalPlanned += cat.planned;
+
+                const pct = cat.planned > 0 ? (cat.spent / cat.planned) * 100 : 0;
+                
+                const catHtml = `
+                    <div class="group">
+                        <div class="flex justify-between items-center mb-1.5 text-sm">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3.5 h-3.5 rounded-full ${cat.color} shrink-0"></span>
+                                <span class="font-semibold text-slate-800">${cat.name}</span>
+                                ${cat.alert ? `<span class="text-[9px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">${cat.alert}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <span class="font-bold text-slate-800">Rp ${(cat.spent).toLocaleString('id-ID')}</span>
+                                    <span class="text-[11px] text-slate-400 block">dari Rp ${(cat.planned).toLocaleString('id-ID')}</span>
+                                </div>
+                                <button onclick="deleteCategory(${cat.id})" class="text-xs text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-rose-50 rounded-full" title="Hapus Kategori">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div class="${cat.color} h-full rounded-full transition-all duration-300" style="width: ${Math.min(pct, 100)}%;"></div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += catHtml;
             });
 
-            finalScript += `\n\n“Dan seperti biasa, nanti di tengah live juga akan ada info peluang kolaborasi untuk teman-teman yang stay sampai akhir ”\n\n`;
-            finalScript += `“Jadi pastikan jangan ke mana-mana… langsung kita masuk ke berita pertama.”\n\n`;
+            // Calculate progress stats
+            const spentJuta = totalSpent / 1000000;
+            const remainingJuta = (budgetTarget * 1000000 - totalSpent) / 1000000;
+            const percentage = budgetTarget > 0 ? (spentJuta / budgetTarget) * 100 : 0;
 
-            const promoScript = `=====================================\nSELINGAN PROMOSI\n=====================================\n\n“Teman-teman, sebelum lanjut ke berita berikutnya, kami ingin menyampaikan bahwa\nGerbang Nusantara saat ini terbuka untuk kerja sama dan sponsor ”\n“Buat kalian yang punya:\nUMKM, Brand lokal, Jasa atau usaha, Atau kegiatan/event yang ingin dipromosikan\n\nBisa banget tampil di live ini dan dijangkau langsung oleh audiens kami.”\n“Formatnya bisa:\nMention di live\nReview produk\nAtau bahkan segmen khusus”\n“Silakan hubungi kami melalui DM atau kontak yang ada di bio ya.”\n“Dukung media lokal, dan mari tumbuh bersama ”\n\n“Lanjut kita ke berita berikutnya.”\n\n`;
+            // DOM Updates for Budget Module
+            document.getElementById('budget-spent-large').textContent = `Rp ${spentJuta.toFixed(1)} jt`;
+            document.getElementById('budget-target-span').textContent = budgetTarget.toString();
+            document.getElementById('budget-percentage').textContent = `${percentage.toFixed(0)}% dari anggaran`;
+            document.getElementById('budget-progress-bar').style.width = `${Math.min(percentage, 100)}%`;
 
-            processedNewsArray.forEach((item, index) => {
-                const c = item.formattedContent;
-                finalScript += `--------------------------------------------------\n`;
-                finalScript += `Judul \n${c.title}\n\n`;
-                finalScript += `Hoox\n${c.hoox}\n\n`;
-                finalScript += `Story\n${c.story}\n\n`;
-                finalScript += `Observation\n${c.observation}\n\n`;
-                finalScript += `Problem\n${c.problem}\n\n`;
-                finalScript += `Insight\n${c.insight}\n\n`;
-                finalScript += `Solusi\n${c.solusi}\n\n`;
-                finalScript += `Benefit\n${c.benefit}\n\n`;
-                finalScript += `Connection\n${c.connection}\n\n`;
-                finalScript += `CTA\n${c.cta}\n\n`;
-                finalScript += `INTERAKSI KOMENTAR\n\nREAKSI ISU\n${c.reaksi}\n\n`;
+            document.getElementById('card-total-budget').textContent = `${budgetTarget}jt`;
+            document.getElementById('card-planned-budget').textContent = `${(totalPlanned/1000000).toFixed(1)}jt`;
+            document.getElementById('card-spent-budget').textContent = `${spentJuta.toFixed(1)}jt`;
+            document.getElementById('card-rem-budget').textContent = `${remainingJuta.toFixed(1)}jt`;
 
-                if ((index + 1) % 3 === 0 && (index + 1) !== processedNewsArray.length) {
-                    finalScript += promoScript;
+            // Sync with global dashboard stat card
+            document.getElementById('summary-spent').textContent = `Rp ${spentJuta.toFixed(1)} jt`;
+        }
+
+        // Core Functions: CHECKLISTS
+        function renderTasks() {
+            const container = document.getElementById('task-list-container');
+            container.innerHTML = '';
+
+            let filtered = taskList;
+            if (currentTaskFilter === 'pending') {
+                filtered = taskList.filter(t => !t.completed);
+            } else if (currentTaskFilter === 'completed') {
+                filtered = taskList.filter(t => t.completed);
+            }
+
+            filtered.forEach(task => {
+                const taskHtml = `
+                    <div class="flex items-center justify-between py-4 ${task.completed ? 'opacity-60' : ''}">
+                        <div class="flex items-center gap-3.5 flex-1">
+                            <button onclick="toggleTask(${task.id})" class="w-5 h-5 rounded border-2 ${task.completed ? 'bg-brand-primary border-brand-primary text-white' : 'border-slate-300'} flex items-center justify-center transition">
+                                ${task.completed ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                            </button>
+                            <div>
+                                <span class="text-sm font-semibold text-slate-800 ${task.completed ? 'line-through text-slate-400' : ''}">${task.text}</span>
+                                <span class="text-[10px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded-full block w-max mt-1">${task.category}</span>
+                            </div>
+                        </div>
+                        <button onclick="deleteTask(${task.id})" class="text-xs text-rose-500 hover:bg-rose-50 px-2 py-1 rounded transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.innerHTML += taskHtml;
+            });
+
+            // Update Task Dashboard Card urgent tasks (non-completed tasks)
+            const urgentContainer = document.getElementById('dashboard-urgent-tasks');
+            urgentContainer.innerHTML = '';
+            const uncompletedTasks = taskList.filter(t => !t.completed).slice(0, 3);
+            
+            if(uncompletedTasks.length === 0) {
+                urgentContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Selamat! Semua tugas persiapan selesai.</p>`;
+            } else {
+                uncompletedTasks.forEach(task => {
+                    urgentContainer.innerHTML += `
+                        <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <button onclick="toggleTask(${task.id})" class="w-4 h-4 rounded border-2 border-slate-300 flex items-center justify-center bg-white">
+                            </button>
+                            <div class="flex-1">
+                                <p class="text-xs font-semibold text-slate-800">${task.text}</p>
+                                <p class="text-[9px] text-slate-400 mt-0.5">${task.category}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Update Task Module Statistics
+            const completedCount = taskList.filter(t => t.completed).length;
+            const totalCount = taskList.length;
+            const pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+            document.getElementById('task-pct-value').textContent = `${pct}%`;
+            document.getElementById('task-progress-bar').style.width = `${pct}%`;
+            document.getElementById('task-progress-stat').textContent = `${pct}% Selesai`;
+        }
+
+        function toggleTask(id) {
+            const task = taskList.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                renderAll();
+            }
+        }
+
+        function deleteTask(id) {
+            taskList = taskList.filter(t => t.id !== id);
+            renderAll();
+        }
+
+        function saveNewTask() {
+            const text = document.getElementById('input-task-name').value;
+            const category = document.getElementById('input-task-cat').value;
+
+            if (text) {
+                taskList.push({
+                    id: Date.now(),
+                    text: text,
+                    category: category,
+                    completed: false
+                });
+                document.getElementById('input-task-name').value = '';
+                closeModal('modal-add-task');
+                renderAll();
+            }
+        }
+
+        function filterTasks(status) {
+            currentTaskFilter = status;
+            document.querySelectorAll('.task-filter-btn').forEach(btn => {
+                btn.className = "task-filter-btn px-4 py-2 text-xs font-medium rounded-full bg-slate-50 text-slate-600 hover:bg-slate-100 transition";
+            });
+            const activeBtn = document.getElementById('filter-task-' + status);
+            activeBtn.className = "task-filter-btn px-4 py-2 text-xs font-semibold rounded-full bg-brand-primary text-white transition";
+            renderTasks();
+        }
+
+        // Core Functions: GUESTS (RSVP)
+        function renderGuests() {
+            const container = document.getElementById('guest-table-body');
+            container.innerHTML = '';
+
+            let countTotal = guestList.length;
+            let countYes = guestList.filter(g => g.rsvp === 'yes').length;
+            let countNo = guestList.filter(g => g.rsvp === 'no').length;
+            let countPending = guestList.filter(g => g.rsvp === 'pending').length;
+
+            guestList.forEach(guest => {
+                let badgeClass = "bg-amber-100 text-amber-800";
+                let statusLabel = "Menunggu Konfirmasi";
+                if(guest.rsvp === 'yes') {
+                    badgeClass = "bg-emerald-100 text-emerald-800";
+                    statusLabel = "Konfirmasi Hadir";
+                } else if(guest.rsvp === 'no') {
+                    badgeClass = "bg-rose-100 text-rose-800";
+                    statusLabel = "Berhalangan";
                 }
+
+                const trHtml = `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-6 font-semibold text-slate-800">${guest.name}</td>
+                        <td class="py-4 px-6">${guest.group}</td>
+                        <td class="py-4 px-6">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${badgeClass}">${statusLabel}</span>
+                        </td>
+                        <td class="py-4 px-6 font-bold text-slate-800">${guest.pax} Pax</td>
+                        <td class="py-4 px-6 text-center">
+                            <div class="flex justify-center gap-1.5">
+                                <button onclick="setRsvpStatus(${guest.id}, 'yes')" class="text-emerald-600 hover:bg-emerald-50 px-2 py-1 rounded-md text-xs font-bold" title="Hadir"><i class="fa-solid fa-circle-check"></i></button>
+                                <button onclick="setRsvpStatus(${guest.id}, 'no')" class="text-rose-600 hover:bg-rose-50 px-2 py-1 rounded-md text-xs font-bold" title="Tidak Hadir"><i class="fa-solid fa-circle-xmark"></i></button>
+                                <button onclick="deleteGuest(${guest.id})" class="text-slate-400 hover:text-slate-600 px-2 py-1 rounded-md text-xs" title="Hapus"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                container.innerHTML += trHtml;
             });
 
-            document.getElementById('outputText').value = finalScript;
+            // Update status counts
+            document.getElementById('guest-stat-total').textContent = countTotal;
+            document.getElementById('guest-stat-yes').textContent = countYes;
+            document.getElementById('guest-stat-no').textContent = countNo;
+            document.getElementById('guest-stat-pending').textContent = countPending;
+
+            document.getElementById('summary-guests').textContent = `${countTotal} Orang`;
         }
 
-        window.copyToClipboard = function() {
-            const outputText = document.getElementById('outputText');
-            if(!outputText.value) return alert('Belum ada naskah yang bisa disalin.');
-            outputText.select();
-            document.execCommand('copy');
-            alert('Naskah berhasil disalin ke clipboard!');
+        function saveNewGuest() {
+            const name = document.getElementById('input-guest-name').value;
+            const group = document.getElementById('input-guest-group').value || "Umum";
+            const rsvp = document.getElementById('input-guest-rsvp').value;
+            const pax = parseInt(document.getElementById('input-guest-pax').value) || 2;
+
+            if (name) {
+                guestList.push({
+                    id: Date.now(),
+                    name: name,
+                    group: group,
+                    rsvp: rsvp,
+                    pax: pax
+                });
+                document.getElementById('input-guest-name').value = '';
+                document.getElementById('input-guest-group').value = '';
+                closeModal('modal-add-guest');
+                renderAll();
+            }
+        }
+
+        function setRsvpStatus(id, status) {
+            const guest = guestList.find(g => g.id === id);
+            if (guest) {
+                guest.rsvp = status;
+                renderAll();
+            }
+        }
+
+        function deleteGuest(id) {
+            guestList = guestList.filter(g => g.id !== id);
+            renderAll();
+        }
+
+        function searchGuests() {
+            const filterValue = document.getElementById('guest-search').value.toLowerCase();
+            const rows = document.getElementById('guest-table-body').getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const nameCell = rows[i].getElementsByTagName('td')[0];
+                if (nameCell) {
+                    const text = nameCell.textContent || nameCell.innerText;
+                    if (text.toLowerCase().indexOf(filterValue) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // Core Functions: RUNDOWN
+        function renderRundown() {
+            const container = document.getElementById('rundown-timeline-container');
+            container.innerHTML = '';
+
+            // Sort rundown by time ascendingly
+            rundownList.sort((a, b) => a.time.localeCompare(b.time));
+
+            rundownList.forEach((run, index) => {
+                const runHtml = `
+                    <div class="relative group">
+                        <!-- Dot design -->
+                        <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full border-2 border-brand-primary bg-white z-10 group-hover:bg-brand-primary transition-colors"></div>
+                        
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-3xs hover:shadow-2xs transition">
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm font-bold text-brand-primary bg-brand-lightPink/40 px-3 py-1 rounded-lg">${run.time}</span>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-800">${run.activity}</h4>
+                                    <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Durasi: ${run.duration} | Penanggung Jawab: <strong>${run.pic}</strong></p>
+                                </div>
+                            </div>
+                            <button onclick="deleteRundown(${run.id})" class="text-xs text-rose-500 hover:bg-rose-100 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-end md:self-center">
+                                <i class="fa-solid fa-trash-can"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += runHtml;
+            });
+        }
+
+        function saveNewRundown() {
+            const time = document.getElementById('input-run-time').value;
+            const duration = document.getElementById('input-run-duration').value || "30 Menit";
+            const activity = document.getElementById('input-run-activity').value;
+            const pic = document.getElementById('input-run-pic').value || "Wedding Organizer";
+
+            if (activity) {
+                rundownList.push({
+                    id: Date.now(),
+                    time: time,
+                    duration: duration,
+                    activity: activity,
+                    pic: pic
+                });
+                document.getElementById('input-run-activity').value = '';
+                document.getElementById('input-run-pic').value = '';
+                closeModal('modal-add-rundown');
+                renderRundown();
+            }
+        }
+
+        function deleteRundown(id) {
+            if(confirm("Hapus agenda rundown ini?")) {
+                rundownList = rundownList.filter(r => r.id !== id);
+                renderRundown();
+            }
+        }
+
+        function updateSummaryCards() {
+            // General synchronization metrics
+            const uncompletedTasks = taskList.filter(t => !t.completed).length;
+            document.getElementById('countdown-days').textContent = `167 Hari Lagi`;
         }
     </script>
 </body>
