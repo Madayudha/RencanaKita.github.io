@@ -34,6 +34,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (Ekspor & Impor Excel/CSV) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Mammoth.js (Impor Word .docx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth.js/1.6.0/mammoth.browser.min.js"></script>
+    <!-- PDF.js (Impor PDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (window['pdfjsLib']) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        }
+    </script>
     
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -289,12 +300,16 @@
 
         <!-- ==================== TAB: UNDANGAN & RSVP ==================== -->
         <section id="tab-tamu" class="tab-content hidden space-y-4">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                 <div>
                     <h2 class="font-serif text-xl font-bold text-slate-800">Daftar Tamu & RSVP Otomatis</h2>
                     <p class="text-xs text-slate-500">Data terupdate real-time saat tamu mengisi link konfirmasi undangan custom.</p>
                 </div>
-                <button onclick="protectedAction(() => openAddGuestModal())" class="bg-brand-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-brand-secondary"><i class="fa-solid fa-user-plus mr-1"></i>Tambah Tamu</button>
+                <div class="flex gap-2 shrink-0">
+                    <button onclick="protectedAction(() => openImportGuestModal())" class="bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-50 shadow-2xs"><i class="fa-solid fa-file-import mr-1 text-brand-primary"></i>Impor File</button>
+                    <button onclick="downloadGuestExcel()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-emerald-700 shadow-xs"><i class="fa-solid fa-file-excel mr-1"></i>Download Excel</button>
+                    <button onclick="protectedAction(() => openAddGuestModal())" class="bg-brand-primary text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-brand-secondary"><i class="fa-solid fa-user-plus mr-1"></i>Tambah Tamu</button>
+                </div>
             </div>
 
             <!-- RSVP Summary Cards -->
@@ -319,18 +334,26 @@
 
             <!-- Table Container -->
             <div class="bg-white rounded-xl border border-slate-150 shadow-2xs overflow-hidden">
-                <div class="p-3 bg-slate-50 border-b border-slate-150 flex justify-between items-center gap-2">
+                <div class="p-3 bg-slate-50 border-b border-slate-150 flex flex-wrap justify-between items-center gap-2">
                     <span class="text-xs font-bold text-slate-700">Database Tamu</span>
-                    <input type="text" id="guest-search" oninput="searchGuests()" placeholder="Cari nama..." class="bg-white border border-slate-200 px-2.5 py-1 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary w-40">
+                    <div class="flex gap-2">
+                        <select id="guest-filter-pihak" onchange="renderGuests()" class="bg-white border border-slate-200 px-2 py-1 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary">
+                            <option value="Semua">Semua Pihak</option>
+                            <option value="Laki-laki">Pihak Laki-laki</option>
+                            <option value="Perempuan">Pihak Perempuan</option>
+                        </select>
+                        <input type="text" id="guest-search" oninput="renderGuests()" placeholder="Cari nama..." class="bg-white border border-slate-200 px-2.5 py-1 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary w-40">
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse min-w-[600px]">
+                    <table class="w-full text-left text-xs border-collapse min-w-[750px]">
                         <thead>
                             <tr class="bg-slate-100/50 text-slate-500 font-bold border-b border-slate-150 uppercase tracking-wider text-[10px]">
                                 <th class="p-3">Nama Tamu</th>
-                                <th class="p-3">Kategori</th>
-                                <th class="p-3">Status RSVP</th>
-                                <th class="p-3">Pax & Info</th>
+                                <th class="p-3">Pihak</th>
+                                <th class="p-3">No. HP / WhatsApp</th>
+                                <th class="p-3">Status Undangan</th>
+                                <th class="p-3">Konfirmasi Kehadiran</th>
                                 <th class="p-3 text-center">Aksi Manajemen</th>
                             </tr>
                         </thead>
@@ -609,7 +632,17 @@
             <div class="flex justify-between items-center"><h4 id="guest-modal-title" class="font-bold text-sm">Manajemen Calon Tamu</h4><button onclick="closeModal('modal-add-guest')"><i class="fa-solid fa-xmark text-slate-400"></i></button></div>
             <input type="hidden" id="in-guest-id">
             <div class="space-y-3">
-                <input type="text" id="in-guest-name" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:outline-none" placeholder="Nama Lengkap Tamu">
+                <div>
+                    <input type="text" id="in-guest-name" oninput="checkDuplicateGuestName()" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:outline-none" placeholder="Nama Lengkap Tamu">
+                    <p id="guest-duplicate-warning" class="hidden text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-md p-1.5 mt-1.5 leading-snug"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="in-guest-pihak" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:outline-none bg-white">
+                        <option value="Laki-laki">Pihak Laki-laki</option>
+                        <option value="Perempuan">Pihak Perempuan</option>
+                    </select>
+                    <input type="tel" id="in-guest-phone" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:outline-none" placeholder="No. WhatsApp/HP">
+                </div>
                 <input type="text" id="in-guest-group" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:outline-none" placeholder="Kategori Kelompok">
                 <div class="grid grid-cols-2 gap-2">
                     <input type="number" id="in-guest-pax" class="w-full border border-slate-200 rounded-lg p-2 text-xs focus:outline-none" placeholder="Jumlah Pax" value="2">
@@ -617,6 +650,52 @@
                 </div>
             </div>
             <button onclick="actionSaveGuest()" class="w-full py-2 bg-brand-primary text-white text-xs font-bold rounded-lg">Simpan Tamu</button>
+        </div>
+    </div>
+
+    <!-- Modal: Impor Daftar Tamu dari File -->
+    <div id="modal-import-guest" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-xl p-5 w-full max-w-2xl shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h4 class="font-bold text-sm">Impor Daftar Tamu dari File</h4>
+                <button onclick="closeModal('modal-import-guest')"><i class="fa-solid fa-xmark text-slate-400"></i></button>
+            </div>
+
+            <div class="bg-sky-50 border border-sky-100 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed">
+                <p class="font-semibold text-slate-700 mb-1"><i class="fa-solid fa-circle-info text-brand-primary mr-1"></i>Format file yang didukung: <span class="font-mono">.txt</span>, <span class="font-mono">.csv</span>, <span class="font-mono">.xlsx/.xls</span>, <span class="font-mono">.docx</span>, <span class="font-mono">.pdf</span></p>
+                <p>Untuk hasil terbaik, gunakan Excel/CSV dengan kolom (urutan bebas): <strong>Nama, Pihak, No HP, Kategori, Pax, Keterangan</strong>. Untuk file Word/PDF/Teks, tulis satu nama tamu per baris (boleh tambahkan No HP dipisah tab/koma).</p>
+            </div>
+
+            <div>
+                <input type="file" id="in-import-file" accept=".txt,.csv,.xlsx,.xls,.docx,.doc,.pdf" onchange="handleImportFileChange(event)" class="w-full text-xs border border-slate-200 rounded-lg p-2 file:mr-3 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-brand-primary file:text-white file:text-xs file:font-semibold">
+            </div>
+
+            <div id="import-status-msg" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <div id="import-preview-wrapper" class="hidden space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-700">Pratinjau Data (<span id="import-preview-count">0</span> baris ditemukan)</span>
+                    <button onclick="toggleAllImportRows(true)" class="text-[10px] text-brand-primary font-semibold hover:underline">Pilih Semua</button>
+                </div>
+                <div class="overflow-x-auto border border-slate-150 rounded-lg">
+                    <table class="w-full text-left text-[11px] border-collapse min-w-[560px]">
+                        <thead>
+                            <tr class="bg-slate-100/50 text-slate-500 font-bold border-b border-slate-150 uppercase tracking-wider text-[9px]">
+                                <th class="p-2 w-8"></th>
+                                <th class="p-2">Nama Tamu</th>
+                                <th class="p-2">Pihak</th>
+                                <th class="p-2">No. HP</th>
+                                <th class="p-2">Kategori</th>
+                                <th class="p-2 w-14">Pax</th>
+                                <th class="p-2">Ket.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="import-preview-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <p class="text-[10px] text-amber-600"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Baris bertanda kuning terindikasi nama yang sudah ada di database. Centang tetap dibiarkan aktif; hilangkan centang jika tidak ingin menambahkannya.</p>
+                <button onclick="confirmImportGuests()" class="w-full py-2 bg-brand-primary text-white text-xs font-bold rounded-lg"><i class="fa-solid fa-check mr-1"></i>Impor Tamu Terpilih</button>
+            </div>
         </div>
     </div>
 
@@ -817,9 +896,9 @@
         ];
 
         let guestList = [
-            { id: 1, name: "Bpk. Hermawan & Pendamping", group: "Keluarga Besar", rsvp: "yes", pax: 2, info: "Diet: Bebas Gurita" },
-            { id: 2, name: "Andini Sulastri", group: "Rekan Kantor Jusen", rsvp: "no", pax: 1, info: "Plus One: Tidak" },
-            { id: 3, name: "Rian Prasetyo & Partner", group: "Teman Kuliah", rsvp: "pending", pax: 2, info: "-" }
+            { id: 1, name: "Bpk. Hermawan & Pendamping", group: "Keluarga Besar", pihak: "Laki-laki", phone: "081234567890", inviteSent: true, rsvp: "yes", pax: 2, info: "Diet: Bebas Gurita" },
+            { id: 2, name: "Andini Sulastri", group: "Rekan Kantor Jusen", pihak: "Perempuan", phone: "085712345678", inviteSent: true, rsvp: "no", pax: 1, info: "Plus One: Tidak" },
+            { id: 3, name: "Rian Prasetyo & Partner", group: "Teman Kuliah", pihak: "Laki-laki", phone: "087611223344", inviteSent: false, rsvp: "pending", pax: 2, info: "-" }
         ];
 
         let vendorList = [
@@ -1172,9 +1251,12 @@
             document.getElementById('guest-modal-title').textContent = "Tambah Calon Tamu";
             document.getElementById('in-guest-id').value = "";
             document.getElementById('in-guest-name').value = "";
+            document.getElementById('in-guest-pihak').value = "Laki-laki";
+            document.getElementById('in-guest-phone').value = "";
             document.getElementById('in-guest-group').value = "";
             document.getElementById('in-guest-pax').value = "2";
             document.getElementById('in-guest-diet').value = "";
+            hideDuplicateWarning();
             openModal('modal-add-guest');
         }
         function openEditGuestModal(id) {
@@ -1183,52 +1265,90 @@
                 document.getElementById('guest-modal-title').textContent = "Edit Tamu Undangan";
                 document.getElementById('in-guest-id').value = item.id;
                 document.getElementById('in-guest-name').value = item.name;
+                document.getElementById('in-guest-pihak').value = item.pihak || "Laki-laki";
+                document.getElementById('in-guest-phone').value = item.phone || "";
                 document.getElementById('in-guest-group').value = item.group;
                 document.getElementById('in-guest-pax').value = item.pax;
                 document.getElementById('in-guest-diet').value = item.info;
+                hideDuplicateWarning();
                 openModal('modal-add-guest');
             }
+        }
+        // Validasi real-time nama tamu duplikat saat mengetik
+        function checkDuplicateGuestName() {
+            let currentId = document.getElementById('in-guest-id').value;
+            let name = document.getElementById('in-guest-name').value.trim().toLowerCase();
+            const warningEl = document.getElementById('guest-duplicate-warning');
+            if (!name) { hideDuplicateWarning(); return; }
+            let match = guestList.find(g => g.name.trim().toLowerCase() === name && String(g.id) !== String(currentId));
+            if (match) {
+                warningEl.textContent = `⚠️ Peringatan: Nama "${match.name}" sudah terdaftar di kelompok Pihak ${match.pihak || '-'}. Apakah Anda yakin ingin tetap menambahkannya?`;
+                warningEl.classList.remove('hidden');
+            } else {
+                hideDuplicateWarning();
+            }
+        }
+        function hideDuplicateWarning() {
+            const warningEl = document.getElementById('guest-duplicate-warning');
+            warningEl.classList.add('hidden');
+            warningEl.textContent = '';
         }
         function actionSaveGuest() {
             let id = document.getElementById('in-guest-id').value;
             let name = document.getElementById('in-guest-name').value;
+            let pihak = document.getElementById('in-guest-pihak').value || "Laki-laki";
+            let phone = document.getElementById('in-guest-phone').value.replace(/[^0-9]/g, '');
             let group = document.getElementById('in-guest-group').value || "Umum";
             let pax = parseInt(document.getElementById('in-guest-pax').value) || 1;
             let diet = document.getElementById('in-guest-diet').value || "-";
             if(name) {
                 if (id) {
                     let item = guestList.find(x => x.id == id);
-                    if (item) { item.name = name; item.group = group; item.pax = pax; item.info = diet; }
+                    if (item) { item.name = name; item.pihak = pihak; item.phone = phone; item.group = group; item.pax = pax; item.info = diet; }
                 } else {
-                    guestList.push({ id: Date.now(), name: name, group: group, rsvp: "pending", pax: pax, info: diet });
+                    guestList.push({ id: Date.now(), name: name, pihak: pihak, phone: phone, inviteSent: false, group: group, rsvp: "pending", pax: pax, info: diet });
                 }
                 closeModal('modal-add-guest'); renderAll();
             }
         }
         function setGuestRsvp(id, status) { let g = guestList.find(x => x.id === id); if(g) { g.rsvp = status; renderAll(); } }
+        function toggleInviteSent(id) { let g = guestList.find(x => x.id === id); if(g) { g.inviteSent = !g.inviteSent; renderAll(); } }
         function deleteGuest(id) { guestList = guestList.filter(g => g.id !== id); renderAll(); }
-        function searchGuests() {
-            let filter = document.getElementById('guest-search').value.toLowerCase();
-            let rows = document.getElementById('guest-table-body').getElementsByTagName('tr');
-            for(let i=0; i<rows.length; i++) {
-                let name = rows[i].getElementsByTagName('td')[0]?.textContent || "";
-                rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
-            }
-        }
+        function searchGuests() { renderGuests(); }
         function renderGuests() {
             document.getElementById('g-total').textContent = guestList.length;
             document.getElementById('g-yes').textContent = guestList.filter(g => g.rsvp === 'yes').length;
             document.getElementById('g-no').textContent = guestList.filter(g => g.rsvp === 'no').length;
             document.getElementById('g-pending').textContent = guestList.filter(g => g.rsvp === 'pending').length;
+
+            let searchTerm = (document.getElementById('guest-search')?.value || '').toLowerCase();
+            let pihakFilter = document.getElementById('guest-filter-pihak')?.value || 'Semua';
+            let filteredGuests = guestList.filter(g => {
+                let matchName = g.name.toLowerCase().includes(searchTerm);
+                let matchPihak = pihakFilter === 'Semua' || g.pihak === pihakFilter;
+                return matchName && matchPihak;
+            });
+
             const tbody = document.getElementById('guest-table-body'); tbody.innerHTML = '';
-            guestList.forEach(g => {
+            if (filteredGuests.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs italic">Tidak ada tamu yang cocok dengan filter.</td></tr>`;
+                return;
+            }
+            filteredGuests.forEach(g => {
                 let badge = g.rsvp === 'yes' ? "bg-emerald-100 text-emerald-800" : (g.rsvp === 'no' ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800");
+                let kehadiranLabel = g.rsvp === 'yes' ? `Hadir (${g.pax} Orang)` : (g.rsvp === 'no' ? "Tidak Hadir" : "Belum Merespon");
+                let pihakBadge = g.pihak === 'Perempuan' ? "bg-pink-100 text-pink-700" : "bg-sky-100 text-sky-700";
+                let inviteBadge = g.inviteSent ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500";
+                let inviteLabel = g.inviteSent ? "Terkirim" : "Menunggu";
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-semibold">${g.name}</td>
-                        <td class="p-3 text-slate-500">${g.group}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badge}">${g.rsvp}</span></td>
-                        <td class="p-3">${g.pax} Pax <span class="text-[10px] block text-slate-400">${g.info}</span></td>
+                        <td class="p-3 font-semibold">${g.name}<span class="text-[10px] block text-slate-400 font-normal">${g.group} • ${g.info}</span></td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${pihakBadge}">${g.pihak || '-'}</span></td>
+                        <td class="p-3 text-slate-600">${g.phone || '-'}</td>
+                        <td class="p-3">
+                            <button onclick="protectedAction(() => toggleInviteSent(${g.id}))" class="px-2 py-0.5 rounded-full font-bold text-[10px] ${inviteBadge}">${inviteLabel}</button>
+                        </td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badge}">${kehadiranLabel}</span></td>
                         <td class="p-3 text-center">
                             <div class="flex justify-center gap-1.5">
                                 <button onclick="protectedAction(() => setGuestRsvp(${g.id}, 'yes'))" class="text-emerald-600 px-1 py-0.5 rounded border"><i class="fa-solid fa-check"></i></button>
@@ -1238,6 +1358,266 @@
                         </td>
                     </tr>`;
             });
+        }
+
+        // --- MODUL EKSPOR EXCEL (.xlsx) DAFTAR TAMU ---
+        function buildGuestExcelRows(list) {
+            return list.map((g, idx) => ({
+                "No": idx + 1,
+                "Nama Tamu": g.name,
+                "Pihak (Laki-laki / Perempuan)": g.pihak || "-",
+                "No. HP": g.phone || "-",
+                "Status Undangan": g.inviteSent ? "Sent" : "Unsent",
+                "Status RSVP": g.rsvp === 'yes' ? "Hadir" : (g.rsvp === 'no' ? "Tidak Hadir" : "Ragu-ragu"),
+                "Jumlah Pax": g.pax
+            }));
+        }
+        function downloadGuestExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert("Modul Excel gagal dimuat. Periksa koneksi internet Anda dan coba lagi.");
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            const semuaTamu = buildGuestExcelRows(guestList);
+            const lakiLaki = buildGuestExcelRows(guestList.filter(g => g.pihak === 'Laki-laki'));
+            const perempuan = buildGuestExcelRows(guestList.filter(g => g.pihak === 'Perempuan'));
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(semuaTamu), "Semua Tamu");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(lakiLaki), "Tamu Pihak Laki-laki");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(perempuan), "Tamu Pihak Perempuan");
+
+            let namesPart = (document.getElementById('display-profile-names')?.textContent || 'Daftar-Tamu').replace(/[^a-zA-Z0-9]+/g, '-');
+            XLSX.writeFile(wb, `Daftar-Tamu-${namesPart}.xlsx`);
+        }
+
+        // --- MODUL IMPOR DAFTAR TAMU DARI FILE (TXT/CSV/EXCEL/WORD/PDF) ---
+        let importPreviewRows = []; // { name, pihak, phone, group, pax, diet, isDuplicate }
+
+        function openImportGuestModal() {
+            importPreviewRows = [];
+            document.getElementById('in-import-file').value = "";
+            document.getElementById('import-preview-wrapper').classList.add('hidden');
+            hideImportStatus();
+            openModal('modal-import-guest');
+        }
+        function showImportStatus(message, type) {
+            const el = document.getElementById('import-status-msg');
+            const colors = { info: "bg-sky-50 text-sky-700 border border-sky-100", error: "bg-rose-50 text-rose-700 border border-rose-100", success: "bg-emerald-50 text-emerald-700 border border-emerald-100" };
+            el.className = `text-xs p-2 rounded-lg ${colors[type] || colors.info}`;
+            el.textContent = message;
+            el.classList.remove('hidden');
+        }
+        function hideImportStatus() {
+            const el = document.getElementById('import-status-msg');
+            el.classList.add('hidden'); el.textContent = '';
+        }
+
+        const IMPORT_COL_KEYS = {
+            name: ['nama', 'name'],
+            pihak: ['pihak', 'sisi', 'kubu'],
+            phone: ['hp', 'telp', 'telepon', 'whatsapp', 'wa', 'phone', 'nomor'],
+            group: ['kategori', 'kelompok', 'group'],
+            pax: ['pax', 'jumlah', 'orang'],
+            diet: ['diet', 'keterangan', 'catatan', 'info']
+        };
+        // Deteksi apakah baris pertama adalah header kolom, dan petakan indeks kolomnya
+        function detectImportHeaderMap(row) {
+            let map = {}; let isHeader = false;
+            row.forEach((cell, idx) => {
+                let c = String(cell || '').toLowerCase().trim();
+                if (!c) return;
+                if (IMPORT_COL_KEYS.name.some(k => c.includes(k))) { map.name = idx; isHeader = true; }
+                else if (IMPORT_COL_KEYS.phone.some(k => c.includes(k))) map.phone = idx;
+                else if (IMPORT_COL_KEYS.pihak.some(k => c.includes(k))) map.pihak = idx;
+                else if (IMPORT_COL_KEYS.group.some(k => c.includes(k))) map.group = idx;
+                else if (IMPORT_COL_KEYS.pax.some(k => c.includes(k))) map.pax = idx;
+                else if (IMPORT_COL_KEYS.diet.some(k => c.includes(k))) map.diet = idx;
+            });
+            return isHeader ? map : null;
+        }
+        function normalizePihakValue(raw) {
+            let v = String(raw || '').trim().toLowerCase();
+            if (/perempuan|wanita|^p$/i.test(v)) return "Perempuan";
+            if (/laki|pria|^l$/i.test(v)) return "Laki-laki";
+            return "Laki-laki";
+        }
+        // Ubah kumpulan baris array (dari CSV/Excel) menjadi objek tamu terstruktur
+        function parseImportRowsFromArrays(rows) {
+            rows = rows.filter(r => r && r.some(cell => String(cell || '').trim() !== ''));
+            if (rows.length === 0) return [];
+            let headerMap = detectImportHeaderMap(rows[0]);
+            let dataRows = headerMap ? rows.slice(1) : rows;
+            let colMap = headerMap || { name: 0, pihak: 1, phone: 2, group: 3, pax: 4, diet: 5 };
+            let results = [];
+            dataRows.forEach(r => {
+                let nameVal = colMap.name !== undefined && r[colMap.name] !== undefined ? String(r[colMap.name]).trim() : '';
+                if (!nameVal) return;
+                let pihakVal = colMap.pihak !== undefined ? normalizePihakValue(r[colMap.pihak]) : "Laki-laki";
+                let phoneVal = colMap.phone !== undefined && r[colMap.phone] !== undefined ? String(r[colMap.phone]).replace(/[^0-9]/g, '') : '';
+                let groupVal = colMap.group !== undefined && r[colMap.group] !== undefined && String(r[colMap.group]).trim() ? String(r[colMap.group]).trim() : 'Umum';
+                let paxRaw = colMap.pax !== undefined ? parseInt(r[colMap.pax]) : NaN;
+                let paxVal = isNaN(paxRaw) || paxRaw < 1 ? 1 : paxRaw;
+                let dietVal = colMap.diet !== undefined && r[colMap.diet] !== undefined && String(r[colMap.diet]).trim() ? String(r[colMap.diet]).trim() : '-';
+                results.push({ name: nameVal, pihak: pihakVal, phone: phoneVal, group: groupVal, pax: paxVal, diet: dietVal });
+            });
+            return results;
+        }
+        // Ubah teks bebas (dari TXT/Word/PDF) jadi baris array, memisah berdasarkan tab/titik-koma bila ada
+        function parseImportPlainText(text) {
+            let lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            let rows = lines.map(line => {
+                if (line.includes('\t')) return line.split('\t').map(s => s.trim());
+                if (line.split(';').length > 1) return line.split(';').map(s => s.trim());
+                return [line];
+            });
+            return parseImportRowsFromArrays(rows);
+        }
+        function handleImportFileChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            hideImportStatus();
+            document.getElementById('import-preview-wrapper').classList.add('hidden');
+            showImportStatus(`Memproses file "${file.name}"...`, 'info');
+            let ext = file.name.toLowerCase().split('.').pop();
+
+            if (ext === 'txt' || ext === 'csv') {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    let parsed = ext === 'csv' ? parseImportRowsFromArrays(csvTextToRows(e.target.result)) : parseImportPlainText(e.target.result);
+                    finalizeImportParse(parsed, file.name);
+                };
+                reader.onerror = () => showImportStatus('Gagal membaca file teks.', 'error');
+                reader.readAsText(file);
+            } else if (ext === 'xlsx' || ext === 'xls') {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                        const sheet = wb.Sheets[wb.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                        finalizeImportParse(parseImportRowsFromArrays(rows), file.name);
+                    } catch (err) { showImportStatus('Gagal membaca file Excel: ' + err.message, 'error'); }
+                };
+                reader.onerror = () => showImportStatus('Gagal membaca file Excel.', 'error');
+                reader.readAsArrayBuffer(file);
+            } else if (ext === 'docx' || ext === 'doc') {
+                if (typeof mammoth === 'undefined') { showImportStatus('Modul pembaca Word gagal dimuat. Periksa koneksi internet Anda.', 'error'); return; }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    mammoth.extractRawText({ arrayBuffer: e.target.result })
+                        .then(result => finalizeImportParse(parseImportPlainText(result.value), file.name))
+                        .catch(err => showImportStatus('Gagal membaca file Word: ' + err.message, 'error'));
+                };
+                reader.onerror = () => showImportStatus('Gagal membaca file Word.', 'error');
+                reader.readAsArrayBuffer(file);
+            } else if (ext === 'pdf') {
+                if (typeof pdfjsLib === 'undefined') { showImportStatus('Modul pembaca PDF gagal dimuat. Periksa koneksi internet Anda.', 'error'); return; }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise.then(pdf => {
+                        let pagePromises = [];
+                        for (let i = 1; i <= pdf.numPages; i++) pagePromises.push(pdf.getPage(i).then(page => page.getTextContent()));
+                        Promise.all(pagePromises).then(contents => {
+                            let fullText = contents.map(tc => extractLinesFromPdfTextContent(tc)).join('\n');
+                            finalizeImportParse(parseImportPlainText(fullText), file.name);
+                        });
+                    }).catch(err => showImportStatus('Gagal membaca file PDF: ' + err.message, 'error'));
+                };
+                reader.onerror = () => showImportStatus('Gagal membaca file PDF.', 'error');
+                reader.readAsArrayBuffer(file);
+            } else {
+                showImportStatus('Format file tidak didukung. Gunakan .txt, .csv, .xlsx, .docx, atau .pdf.', 'error');
+            }
+        }
+        // Kelompokkan potongan teks PDF menjadi baris berdasarkan posisi vertikal (Y)
+        function extractLinesFromPdfTextContent(textContent) {
+            let lines = []; let currentY = null; let currentLine = [];
+            textContent.items.forEach(item => {
+                let y = Math.round(item.transform[5]);
+                if (currentY === null || Math.abs(y - currentY) > 3) {
+                    if (currentLine.length) lines.push(currentLine.join(' '));
+                    currentLine = [item.str]; currentY = y;
+                } else {
+                    currentLine.push(item.str);
+                }
+            });
+            if (currentLine.length) lines.push(currentLine.join(' '));
+            return lines.join('\n');
+        }
+        // Parser CSV sederhana yang tetap menghormati koma di dalam tanda kutip
+        function csvTextToRows(text) {
+            return text.split(/\r?\n/).filter(l => l.trim() !== '').map(line => {
+                let result = []; let cur = ''; let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    let ch = line[i];
+                    if (ch === '"') { inQuotes = !inQuotes; }
+                    else if (ch === ',' && !inQuotes) { result.push(cur); cur = ''; }
+                    else { cur += ch; }
+                }
+                result.push(cur);
+                return result.map(s => s.trim());
+            });
+        }
+        function finalizeImportParse(parsedRows, fileName) {
+            if (!parsedRows || parsedRows.length === 0) {
+                showImportStatus(`Tidak ada data tamu yang dapat dikenali dari "${fileName}". Pastikan format file sesuai panduan.`, 'error');
+                document.getElementById('import-preview-wrapper').classList.add('hidden');
+                return;
+            }
+            let existingNames = guestList.map(g => g.name.trim().toLowerCase());
+            importPreviewRows = parsedRows.map(r => ({ ...r, isDuplicate: existingNames.includes(r.name.trim().toLowerCase()) }));
+            showImportStatus(`Berhasil membaca "${fileName}". Silakan periksa pratinjau sebelum mengimpor.`, 'success');
+            renderImportPreview();
+        }
+        function renderImportPreview() {
+            const wrapper = document.getElementById('import-preview-wrapper');
+            const body = document.getElementById('import-preview-body');
+            document.getElementById('import-preview-count').textContent = importPreviewRows.length;
+            body.innerHTML = '';
+            importPreviewRows.forEach((r, idx) => {
+                body.innerHTML += `
+                    <tr class="${r.isDuplicate ? 'bg-amber-50' : ''}">
+                        <td class="p-2"><input type="checkbox" id="imp-check-${idx}" checked class="accent-brand-primary"></td>
+                        <td class="p-2 font-semibold text-slate-700">${r.name}${r.isDuplicate ? ' <span class="text-amber-600 text-[9px] font-bold">(mirip sudah ada)</span>' : ''}</td>
+                        <td class="p-2">
+                            <select id="imp-pihak-${idx}" class="border border-slate-200 rounded p-1 text-[10px] bg-white">
+                                <option value="Laki-laki" ${r.pihak === 'Laki-laki' ? 'selected' : ''}>Laki-laki</option>
+                                <option value="Perempuan" ${r.pihak === 'Perempuan' ? 'selected' : ''}>Perempuan</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-slate-500">${r.phone || '-'}</td>
+                        <td class="p-2 text-slate-500">${r.group}</td>
+                        <td class="p-2 text-slate-500">${r.pax}</td>
+                        <td class="p-2 text-slate-500">${r.diet}</td>
+                    </tr>`;
+            });
+            wrapper.classList.remove('hidden');
+        }
+        function toggleAllImportRows(checked) {
+            importPreviewRows.forEach((r, idx) => { const cb = document.getElementById(`imp-check-${idx}`); if (cb) cb.checked = checked; });
+        }
+        function confirmImportGuests() {
+            let addedCount = 0; let skippedCount = 0;
+            importPreviewRows.forEach((r, idx) => {
+                const cb = document.getElementById(`imp-check-${idx}`);
+                if (!cb || !cb.checked) { skippedCount++; return; }
+                const pihakSelect = document.getElementById(`imp-pihak-${idx}`);
+                guestList.push({
+                    id: Date.now() + idx,
+                    name: r.name,
+                    pihak: pihakSelect ? pihakSelect.value : r.pihak,
+                    phone: r.phone,
+                    inviteSent: false,
+                    group: r.group,
+                    rsvp: "pending",
+                    pax: r.pax,
+                    info: r.diet
+                });
+                addedCount++;
+            });
+            closeModal('modal-import-guest');
+            renderAll();
+            alert(`Impor selesai. ${addedCount} tamu ditambahkan${skippedCount > 0 ? `, ${skippedCount} baris dilewati.` : '.'}`);
         }
 
         // --- MODUL LOGISTIK: MANAJEMEN VENDOR ENGINE ---
